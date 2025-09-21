@@ -25,8 +25,8 @@ cd "$REPO_DIR"
 echo "编译 usdewatcher..."
 go build $GO_FLAGS -o "$BIN_PATH" ./cmd/usdewatcher
 
-echo "以 nohup 方式启动..."
-nohup "$BIN_PATH" --config "$CONFIG_PATH" >>"$LOG_FILE" 2>&1 &
+echo "以 nohup 方式启动 (usdewatcher run)..."
+nohup "$BIN_PATH" run --config "$CONFIG_PATH" >>"$LOG_FILE" 2>&1 &
 PID=$!
 
 echo "服务已启动，PID=$PID，日志输出到 $LOG_FILE"
