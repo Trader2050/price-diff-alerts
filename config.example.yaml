@@ -1,0 +1,49 @@
+app:
+  name: usdewatcher
+  environment: development
+
+logging:
+  level: info
+  format: json
+  pretty: false
+
+database:
+  dsn: postgres://usde:123456@localhost:5432/usde?sslmode=disable
+  max_open_conns: 10
+  max_idle_conns: 5
+  conn_max_lifetime: 30m
+  migrations_path: db/migrations
+
+scheduler:
+  interval: 5m
+  align_to_bucket: true
+  advisory_lock_key: 1970488389
+  startup_delay: 10s
+
+ethereum:
+  rpc_url: https://mainnet.infura.io/v3/your-key
+  susde_address: 0x9D39A5DE30e57443BfF2A8307A4256c8797A3497
+  usde_address: 0x4c9EDD5852cd905f086C759E8383e09bff1E68B3
+  request_timeout: 10s
+
+cow:
+  base_url: https://api.cow.fi/mainnet/api/v1
+  price_quality: optimal
+  notional_usde: 10000
+  request_timeout: 10s
+  user_agent: usdewatcher/1.0
+
+alerting:
+  enabled: true
+  threshold_pct: 0.4
+  cooldown: 30m
+  channels:
+    - telegram
+  telegram:
+    enabled: true
+    bot_token: your-telegram-bot-token
+    chat_id: "@your_channel"  # 或者数字 chat id
+    api_base: https://api.telegram.org
+
+export:
+  max_data_points: 100000

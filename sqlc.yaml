@@ -1,0 +1,26 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "db/migrations"
+    queries: "db/queries"
+    gen:
+      go:
+        package: "sqlc"
+        out: "internal/storage/sqlc"
+        sql_package: "pgx/v5"
+        emit_interface: false
+        emit_json_tags: true
+        emit_empty_slices: true
+        overrides:
+          - column: "rate_samples.deviation_pct"
+            go_type: "github.com/shopspring/decimal.Decimal"
+          - column: "rate_samples.official_susde_per_usde"
+            go_type: "github.com/shopspring/decimal.Decimal"
+          - column: "rate_samples.market_susde_per_usde"
+            go_type: "github.com/shopspring/decimal.Decimal"
+          - column: "rate_samples.notional_usde"
+            go_type: "github.com/shopspring/decimal.Decimal"
+          - column: "alerts.deviation_pct"
+            go_type: "github.com/shopspring/decimal.Decimal"
+          - column: "alerts.threshold_pct"
+            go_type: "github.com/shopspring/decimal.Decimal"
