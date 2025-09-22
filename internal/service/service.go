@@ -31,6 +31,8 @@ type Service struct {
 	alertsOn  bool
 	locker    storage.AdvisoryLocker
 	lockKey   int64
+
+	consecutiveBreaches int
 }
 
 // New constructs the monitoring service.
@@ -135,6 +137,14 @@ func (s *Service) executeBucket(ctx context.Context, bucket time.Time) error {
 
 	if s.alertsOn && s.notifier != nil && !s.threshold.IsZero() {
 		if deviation.Abs().GreaterThan(s.threshold) {
+			s.consecutiveBreaches++
+			if s.consecutiveBreaches < 2 {
+				s.logger.Debug().Time("bucket", bucket).
+					Str("deviation_pct", deviation.String()).
+					Msg("threshold breached once; waiting for confirmation")
+				return nil
+			}
+
 			direction := classifyDeviation(deviation)
 			note := alerting.Notification{
 				Bucket:       bucket,
@@ -161,7 +171,11 @@ func (s *Service) executeBucket(ctx context.Context, bucket time.Time) error {
 			if err := s.notifier.Notify(ctx, note); err != nil {
 				s.logger.Error().Err(err).Time("bucket", bucket).Msg("failed to dispatch alert")
 			}
+		} else if s.consecutiveBreaches > 0 {
+			s.consecutiveBreaches = 0
 		}
+	} else if s.consecutiveBreaches > 0 {
+		s.consecutiveBreaches = 0
 	}
 
 	return nil
